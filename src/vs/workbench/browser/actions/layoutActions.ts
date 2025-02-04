@@ -1183,6 +1183,17 @@ abstract class BaseResizeViewAction extends Action2 {
 			layoutService.resizePart(part, widthChange, heightChange);
 		}
 	}
+
+	protected setPartSizeByPixel(exactWith: number, layoutService: IWorkbenchLayoutService,  partToResize: Parts.ACTIVITYBAR_PART | Parts.SIDEBAR_PART): void {
+		console.log('exactWith:', exactWith);
+		const part: Parts | undefined = partToResize;
+		console.log('part:', part);
+		const size = layoutService.getSize(part);
+		console.log('size:', size);
+		const copy = {...size};
+		copy.width = exactWith;
+		layoutService.setSize(part, copy);
+	}
 }
 
 class IncreaseViewSizeAction extends BaseResizeViewAction {
@@ -1214,6 +1225,21 @@ class IncreaseViewWidthAction extends BaseResizeViewAction {
 
 	run(accessor: ServicesAccessor): void {
 		this.resizePart(BaseResizeViewAction.RESIZE_INCREMENT, 0, accessor.get(IWorkbenchLayoutService), Parts.EDITOR_PART);
+	}
+}
+
+class SetViewWidthAction extends BaseResizeViewAction {
+	constructor() {
+		super({
+			id: 'workbench.action.setViewWidth',
+			title: localize2('setSideBarWidth', 'Set Side Bar Width'),
+			f1: true,
+			precondition: IsAuxiliaryWindowFocusedContext.toNegated()
+		});
+	}
+
+	run(accessor: ServicesAccessor, pixel: number, editorPart: Parts.ACTIVITYBAR_PART | Parts.SIDEBAR_PART): void {
+		this.setPartSizeByPixel(pixel, accessor.get(IWorkbenchLayoutService), editorPart);
 	}
 }
 
@@ -1282,6 +1308,7 @@ class DecreaseViewHeightAction extends BaseResizeViewAction {
 
 registerAction2(IncreaseViewSizeAction);
 registerAction2(IncreaseViewWidthAction);
+registerAction2(SetViewWidthAction);
 registerAction2(IncreaseViewHeightAction);
 
 registerAction2(DecreaseViewSizeAction);

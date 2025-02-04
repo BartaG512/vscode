@@ -11,14 +11,14 @@ import { Extensions, PaneComposite, PaneCompositeDescriptor, PaneCompositeRegist
 import { IPaneComposite } from '../../common/panecomposite.js';
 import { IViewDescriptorService, ViewContainerLocation } from '../../common/views.js';
 import { DisposableStore, MutableDisposable } from '../../../base/common/lifecycle.js';
-import { IView } from '../../../base/browser/ui/grid/grid.js';
-import { IWorkbenchLayoutService, Parts } from '../../services/layout/browser/layoutService.js';
+import { IView, IViewSize } from '../../../base/browser/ui/grid/grid.js';
+import { IWorkbenchLayoutService, LayoutSettings, Parts } from '../../services/layout/browser/layoutService.js';
 import { CompositePart, ICompositeTitleLabel } from './compositePart.js';
 import { IPaneCompositeBarOptions, PaneCompositeBar } from './paneCompositeBar.js';
 import { Dimension, EventHelper, trackFocus, $, addDisposableListener, EventType, prepend, getWindow } from '../../../base/browser/dom.js';
 import { Registry } from '../../../platform/registry/common/platform.js';
 import { INotificationService } from '../../../platform/notification/common/notification.js';
-import { IStorageService } from '../../../platform/storage/common/storage.js';
+import { IStorageService, StorageScope, StorageTarget } from '../../../platform/storage/common/storage.js';
 import { IContextMenuService } from '../../../platform/contextview/browser/contextView.js';
 import { IKeybindingService } from '../../../platform/keybinding/common/keybinding.js';
 import { IThemeService } from '../../../platform/theme/common/themeService.js';
@@ -223,11 +223,21 @@ export abstract class AbstractPaneCompositePart extends CompositePart<PaneCompos
 	}
 
 	private onDidOpen(composite: IComposite): void {
+		const id = composite.getId();
+		const widths = this.storageService.getObject<{[key: string]: IViewSize}>(LayoutSettings.WORKBENCH_WIDTHS, StorageScope.PROFILE) ?? {};
+		const size = widths[id];
+		if (size){
+			this.layoutService.setSize(this.partId,size );
+		}
 		this.activePaneContextKey.set(composite.getId());
 	}
 
 	private onDidClose(composite: IComposite): void {
+		const currentSize = this.layoutService.getSize(this.partId);
 		const id = composite.getId();
+		const widths = this.storageService.getObject<{[key: string]: IViewSize}>(LayoutSettings.WORKBENCH_WIDTHS, StorageScope.PROFILE) ?? {};
+		widths[id] = currentSize;
+		this.storageService.store(LayoutSettings.WORKBENCH_WIDTHS, widths, StorageScope.PROFILE, StorageTarget.USER);
 		if (this.activePaneContextKey.get() === id) {
 			this.activePaneContextKey.reset();
 		}
