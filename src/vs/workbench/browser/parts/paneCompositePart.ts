@@ -224,20 +224,27 @@ export abstract class AbstractPaneCompositePart extends CompositePart<PaneCompos
 
 	private onDidOpen(composite: IComposite): void {
 		const id = composite.getId();
+		const viewletKey = `${this.partId}-${id}`;
 		const widths = this.storageService.getObject<{[key: string]: IViewSize}>(LayoutSettings.WORKBENCH_WIDTHS, StorageScope.PROFILE) ?? {};
-		const size = widths[id];
+		const size = widths[viewletKey];
 		if (size){
-			this.layoutService.setSize(this.partId,size );
+			const sizeCopy = {...size};
+			if (this.partId === Parts.PANEL_PART)  {
+				const currentSize = this.layoutService.getSize(this.partId);
+				sizeCopy.width = currentSize.width; // Preserve the width
+			}
+			this.layoutService.setSize(this.partId, sizeCopy );
 		}
-		this.activePaneContextKey.set(composite.getId());
+		this.activePaneContextKey.set(id);
 	}
 
 	private onDidClose(composite: IComposite): void {
-		const currentSize = this.layoutService.getSize(this.partId);
 		const id = composite.getId();
-		const widths = this.storageService.getObject<{[key: string]: IViewSize}>(LayoutSettings.WORKBENCH_WIDTHS, StorageScope.PROFILE) ?? {};
-		widths[id] = currentSize;
-		this.storageService.store(LayoutSettings.WORKBENCH_WIDTHS, widths, StorageScope.PROFILE, StorageTarget.USER);
+		const currentSize = this.layoutService.getSize(this.partId);
+		const viewletWidths = this.storageService.getObject<{[key: string]: IViewSize}>(LayoutSettings.WORKBENCH_WIDTHS, StorageScope.PROFILE) ?? {};
+		const viewletKey = `${this.partId}-${id}`;
+		viewletWidths[viewletKey] = {...currentSize};
+		this.storageService.store(LayoutSettings.WORKBENCH_WIDTHS, viewletWidths, StorageScope.PROFILE, StorageTarget.USER);
 		if (this.activePaneContextKey.get() === id) {
 			this.activePaneContextKey.reset();
 		}

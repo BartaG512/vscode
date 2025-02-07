@@ -3,7 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { app, BrowserWindow, protocol, session, Session, systemPreferences, WebFrameMain } from 'electron';
+import { app, BrowserWindow, protocol, session, Session, systemPreferences, WebFrameMain, nativeImage } from 'electron';
 import { addUNCHostToAllowlist, disableUNCAccessRestrictions } from '../../base/node/unc.js';
 import { validatedIpcMain } from '../../base/parts/ipc/electron-main/ipcMain.js';
 import { hostname, release } from 'os';
@@ -505,7 +505,11 @@ export class CodeApplication extends Disposable {
 
 		validatedIpcMain.on('vscode:toggleDevTools', event => event.sender.toggleDevTools());
 		validatedIpcMain.on('vscode:openDevTools', event => event.sender.openDevTools());
-
+		validatedIpcMain.on('vscode:change-icon', (event, newIconPath) => {
+			const window = this.windowsMainService?.getFocusedWindow();
+			const newIcon = nativeImage.createFromPath(newIconPath);
+			window!.win!.setIcon(newIcon);
+		});
 		validatedIpcMain.on('vscode:reloadWindow', event => event.sender.reload());
 
 		validatedIpcMain.handle('vscode:notifyZoomLevel', async (event, zoomLevel: number | undefined) => {

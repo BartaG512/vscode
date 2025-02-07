@@ -1,4 +1,5 @@
 {
+  "checksumFailMoreInfoUrl": "",
 	"extensionsGallery": {
 		"nlsBaseUrl": "https://www.vscode-unpkg.net/_lp/",
 		"serviceUrl": "https://marketplace.visualstudio.com/_apis/public/gallery",
