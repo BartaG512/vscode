@@ -7,7 +7,7 @@ jobs:
   build:
     name: Build VSCode Win32 x64
     runs-on: windows-2022  # Windows Server 2022 runner
-    timeout-minutes: 40
+    timeout-minutes: 120
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
