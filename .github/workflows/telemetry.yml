@@ -1,19 +1,34 @@
-name: 'Telemetry'
+name: Manual Build
+
 on:
-  pull_request:
+  workflow_dispatch
+
 jobs:
-  check-metdata:
-    name: 'Check metadata'
-    runs-on: 'ubuntu-latest'
+  build:
+    name: Build VSCode Win32 x64
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
-      - uses: 'actions/checkout@v4'
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - uses: 'actions/setup-node@v4'
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: 'lts/*'
+          node-version-file: .nvmrc
 
-      - name: 'Run vscode-telemetry-extractor'
-        run: 'npx --package=@vscode/telemetry-extractor --yes vscode-telemetry-extractor -s .'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build VSCode Win32 x64
+        run: npx gulp vscode-win32-x64
+
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vscode-win32-x64
+          path: out/vscode-win32-x64/  # Adjust this if the output folder is different
+          retention-days: 7
