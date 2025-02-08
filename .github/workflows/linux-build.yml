@@ -22,11 +22,6 @@ jobs:
         with:
           node-version-file: repo/.nvmrc  # Specify the correct path to .nvmrc
 
-      - name: Install system dependencies
-        run: |
-          sudo apt update
-          sudo apt install -y libx11-dev libxkbfile-dev libsecret-1-dev rpm
-
       - name: Install Node.js dependencies
         run: npm ci
         working-directory: repo
