@@ -34,5 +34,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: vscode-win32-x64
-          path: repo/VSCode-win32-x64  # Ensure the correct relative path to the output directory
-          retention-days: 7
+          path: VSCode-win32-x64  # Ensure the correct relative path to the output directory
+          retention-days: 12
