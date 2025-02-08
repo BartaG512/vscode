@@ -14,16 +14,13 @@ jobs:
     steps:
       - name: Checkout repository into subdirectory
         uses: actions/checkout@v4
-        # This checks out the repo into a folder called "repo"
-        path: repo
+        with:
+          path: repo  # Corrected placement of the 'path' key
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
-        # If your .nvmrc file is inside the repo folder, you can either specify its path here…
         with:
-          node-version-file: .nvmrc
-        # …or change the working directory so that .nvmrc is found automatically.
-        working-directory: repo
+          node-version-file: repo/.nvmrc  # Specify the correct path to .nvmrc
 
       - name: Install dependencies
         run: npm ci
@@ -37,8 +34,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: vscode-win32-x64
-          # Adjust the path if your build output folder is inside or relative to the "repo" directory.
-          # For example, if the build output is in "repo/../VSCode-win32-x64/" relative to the workspace root,
-          # you might update the path accordingly.
-          path: VSCode-win32-x64
+          path: repo/VSCode-win32-x64  # Ensure the correct relative path to the output directory
           retention-days: 7
