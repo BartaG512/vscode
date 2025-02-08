@@ -12,23 +12,33 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
-      - name: Checkout repository
+      - name: Checkout repository into subdirectory
         uses: actions/checkout@v4
+        # This checks out the repo into a folder called "repo"
+        path: repo
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
+        # If your .nvmrc file is inside the repo folder, you can either specify its path here…
         with:
           node-version-file: .nvmrc
+        # …or change the working directory so that .nvmrc is found automatically.
+        working-directory: repo
 
       - name: Install dependencies
         run: npm ci
+        working-directory: repo
 
       - name: Build VSCode Win32 x64
         run: npx gulp vscode-win32-x64
+        working-directory: repo
 
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
         with:
           name: vscode-win32-x64
-          path: ../VSCode-win32-x64/  # Adjust this if the output folder is different
+          # Adjust the path if your build output folder is inside or relative to the "repo" directory.
+          # For example, if the build output is in "repo/../VSCode-win32-x64/" relative to the workspace root,
+          # you might update the path accordingly.
+          path: VSCode-win32-x64
           retention-days: 7
