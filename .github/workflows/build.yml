@@ -31,7 +31,7 @@ jobs:
         working-directory: repo
 
       - name: Delete previous artifacts
-        uses: actions/delete-artifact@v3
+        uses:  geekyeggo/delete-artifact@v5
         with:
           name: vscode-win32-x64
         continue-on-error: true  # Avoid failure if the artifact doesn't exist
