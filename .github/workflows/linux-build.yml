@@ -1,0 +1,43 @@
+name: Manual Build (Linux)
+
+on:
+  workflow_dispatch
+
+jobs:
+  build:
+    name: Build VSCode Linux x64
+    runs-on: ubuntu-latest  # Ubuntu runner
+    timeout-minutes: 120
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - name: Checkout repository into subdirectory
+        uses: actions/checkout@v4
+        with:
+          path: repo  # Checkout into 'repo' directory
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: repo/.nvmrc  # Specify the correct path to .nvmrc
+
+      - name: Install system dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y libx11-dev libxkbfile-dev libsecret-1-dev rpm
+
+      - name: Install Node.js dependencies
+        run: npm ci
+        working-directory: repo
+
+      - name: Build VSCode Linux x64
+        run: npx gulp vscode-linux-x64
+        working-directory: repo
+
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vscode-linux-x64
+          path: repo/.build/linux-x64  # Ensure correct output path
+          retention-days: 30
