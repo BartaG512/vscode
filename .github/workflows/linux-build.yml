@@ -35,9 +35,15 @@ jobs:
         run: npx gulp vscode-linux-x64
         working-directory: repo
 
+      - name: Delete previous artifacts
+        uses: actions/delete-artifact@v3
+        with:
+          name: vscode-linux-x64
+        continue-on-error: true  # Avoid failure if the artifact doesn't exist
+
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
         with:
           name: vscode-linux-x64
-          path: repo/.build/linux-x64  # Ensure correct output path
-          retention-days: 30
+          path: Vscode-linux-x64
+          retention-days: 30  # Keep only the latest build

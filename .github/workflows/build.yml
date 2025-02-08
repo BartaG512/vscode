@@ -30,6 +30,12 @@ jobs:
         run: npx gulp vscode-win32-x64
         working-directory: repo
 
+      - name: Delete previous artifacts
+        uses: actions/delete-artifact@v3
+        with:
+          name: vscode-win32-x64
+        continue-on-error: true  # Avoid failure if the artifact doesn't exist
+
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4
         with:
